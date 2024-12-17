@@ -23,10 +23,10 @@ const Table = sequelize.define(
       type: DataTypes.STRING,
     },
     created_at: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
     },
     updated_at: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
     },
     status_delete: {
       type: DataTypes.TINYINT,

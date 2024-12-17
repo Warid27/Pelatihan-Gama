@@ -1,4 +1,5 @@
 const eventRepo = require("../repositories/event.repo");
+const moment = require('moment');
 const show = async (req) => {
   let result = await eventRepo.where({status_delete: 0});
   return { hasil: result };
@@ -9,7 +10,7 @@ const insert = async (req) => {
     tempat_acara: req.body.tempat_acara,
     waktu_mulai: req.body.waktu_mulai,
     waktu_selesai: req.body.waktu_selesai,
-    created_at: Date.now(),
+    created_at: moment().format("YYYY-MM-DD"),
   };
   let result = await eventRepo.insert(param);
   return { hasil: result };
@@ -21,7 +22,7 @@ const update = async (id, body) => {
     tempat_acara: body.tempat_acara,
     waktu_mulai: body.waktu_mulai,
     waktu_selesai: body.waktu_selesai,
-    updated_at: Date.now(),
+    updated_at: moment().format("YYYY-MM-DD"),
   };
   let result = await eventRepo.update(id, param);
   return { hasil: result };

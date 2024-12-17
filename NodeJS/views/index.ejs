@@ -1101,7 +1101,7 @@
                     <td class="align-middle">${item.waktu_mulai}</td>
                     <td class="align-middle">${item.waktu_selesai}</td>
                     <td class="align-middle">${item.created_at}</td>
-                    <td class="align-middle">${item.update_at}</td>
+                    <td class="align-middle">${item.updated_at ? item.updated_at : "-"}</td>
                     <td class="align-middle">${item.status_delete}</td>
                   `;
                   dataTable.appendChild(row);
