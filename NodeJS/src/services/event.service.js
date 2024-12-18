@@ -1,20 +1,24 @@
 const eventRepo = require("../repositories/event.repo");
 const moment = require('moment');
 const show = async (req) => {
-  let result = await eventRepo.where({status_delete: 0});
+  let result = await eventRepo.showAll(req);
   return { hasil: result };
 };
 const insert = async (req) => {
+  const { nama, tempat_acara, waktu_mulai, waktu_selesai } = req.body;
+
   let param = {
-    nama: req.body.nama,
-    tempat_acara: req.body.tempat_acara,
-    waktu_mulai: req.body.waktu_mulai,
-    waktu_selesai: req.body.waktu_selesai,
+    nama,
+    tempat_acara,
+    waktu_mulai,
+    waktu_selesai,
     created_at: moment().format("YYYY-MM-DD"),
   };
+
   let result = await eventRepo.insert(param);
   return { hasil: result };
 };
+
 
 const update = async (id, body) => {
   let param = {
