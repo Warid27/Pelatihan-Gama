@@ -1002,16 +1002,6 @@
         <!-- /.content-header -->
         <!-- Main content -->
         <section class="content">
-          <!-- Button trigger modal -->
-          <button
-            type="button"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#modalTambahEvent"
-          >
-            +
-          </button>
-
           <!-- Modal Tambah Data Event -->
           <div
             class="modal fade"
@@ -1090,10 +1080,20 @@
               </div>
             </div>
           </div>
+
           <div class="container-fluid">
             <!-- Small boxes (Stat box) -->
             <div class="row">
               <div class="col-lg-12">
+                <!-- Button trigger modalTambahEvent -->
+                <button
+                  type="button"
+                  class="btn btn-primary mb-3"
+                  data-bs-toggle="modal"
+                  data-bs-target="#modalTambahEvent"
+                >
+                  Tambah Data
+                </button>
                 <div class="card">
                   <div class="card-body">
                     <table class="table text-center" width="100%">
@@ -1107,6 +1107,7 @@
                           <th class="align-middle">Created At</th>
                           <th class="align-middle">Updated At</th>
                           <th class="align-middle">Status Delete</th>
+                          <th class="align-middle">Aksi</th>
                         </tr>
                       </thead>
                       <tbody id="dataTable"></tbody>
@@ -1189,11 +1190,21 @@
     <script>
       // Menampilkan Data
       $(document).ready(function () {
+        loadData();
+      });
+
+      function loadData() {
         $.ajax({
-          url: "/event",
+          url: "https://camel-devoted-teal.ngrok-free.app/event",
+          headers: {
+            "ngrok-skip-browser-warning": "69420",
+          },
           type: "GET",
           dataType: "json",
           contentType: "application/json",
+          xhrFields: {
+            withCredentials: true, // Include cookies if needed
+          },
         })
           .done(function (response) {
             console.log("success", response);
@@ -1209,7 +1220,7 @@
                 // Jika array 'hasil' kosong, tambahkan baris kosong dengan pesan
                 const emptyRow = document.createElement("tr");
                 emptyRow.innerHTML = `
-                <td class="align-middle text-center" colspan="8">Data Belum Ada</td>
+                <td class="align-middle text-center" colspan="9">Data Belum Ada</td>
               `;
                 dataTable.appendChild(emptyRow);
               } else {
@@ -1243,6 +1254,14 @@
                   <td class="align-middle">${
                     item.status_delete ? "Terhapus" : "Aktif"
                   }</td>
+                  <td class="align-middle">
+                    <button id="btnEdit" class="btn btn-warning" data-id_event="${
+                      item.id_event ? item.id_event : "-"
+                    }">Edit</button>
+                    <button id="btnHapus" class="btn btn-danger" data-id_event="${
+                      item.id_event ? item.id_event : "-"
+                    }">Hapus</button>
+                  </td>
                 `;
                   dataTable.appendChild(row);
                 });
@@ -1257,68 +1276,55 @@
           .always(function () {
             console.log("complete");
           });
-      });
+      }
 
-      // Save Data
-      document
-        .querySelector("#tambah_event_form")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
+      $(document).on("submit", "#tambah_event_form", function (e) {
+        e.preventDefault();
 
-          // Ambil nilai input
-          const event_nama_event = document
-            .getElementById("nama_event")
-            .value.trim();
-          const event_tempat_acara = document
-            .getElementById("tempat_acara")
-            .value.trim();
-          const event_waktu_mulai = document
-            .getElementById("waktu_mulai")
-            .value.trim();
-          const event_waktu_selesai = document
-            .getElementById("waktu_selesai")
-            .value.trim();
+        // Ambil nilai input
+        const event_nama_event = $("#nama_event").val().trim();
+        const event_tempat_acara = $("#tempat_acara").val().trim();
+        const event_waktu_mulai = $("#waktu_mulai").val().trim();
+        const event_waktu_selesai = $("#waktu_selesai").val().trim();
 
-          // Validasi Input
-          if (
-            !event_nama_event ||
-            !event_tempat_acara ||
-            !event_waktu_mulai ||
-            !event_waktu_selesai
-          ) {
-            alert("Semua kolom harus diisi!");
-            return;
-          }
+        // Validasi Input
+        if (
+          !event_nama_event ||
+          !event_tempat_acara ||
+          !event_waktu_mulai ||
+          !event_waktu_selesai
+        ) {
+          alert("Semua kolom harus diisi!");
+          return;
+        }
 
-          // Kirim data ke server
-          fetch("/event", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              nama: event_nama_event,
-              tempat_acara: event_tempat_acara,
-              waktu_mulai: event_waktu_mulai,
-              waktu_selesai: event_waktu_selesai,
-            }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.error) {
-                console.error("Error:", data.error);
-                alert("Gagal menambahkan data event.");
-              } else {
-                console.log("Berhasil:", data);
-                alert("Data event berhasil ditambahkan!");
-                // Reload tabel atau halaman
-                location.reload();
-              }
-            })
-            .catch((error) => {
-              console.error("Terjadi kesalahan:", error);
-            });
+        // Kirim data ke server
+        $.ajax({
+          url: "/event",
+          method: "POST",
+          contentType: "application/json",
+          data: JSON.stringify({
+            nama: event_nama_event,
+            tempat_acara: event_tempat_acara,
+            waktu_mulai: event_waktu_mulai,
+            waktu_selesai: event_waktu_selesai,
+          }),
+          success: function (data) {
+            if (data.error) {
+              console.error("Error:", data.error);
+              alert("Gagal menambahkan data event.");
+            } else {
+              console.log("Berhasil:", data);
+              alert("Data event berhasil ditambahkan!");
+              // Reload tabel atau halaman
+              location.reload();
+            }
+          },
+          error: function (error) {
+            console.error("Terjadi kesalahan:", error);
+          },
         });
+      });
     </script>
   </body>
 </html>
